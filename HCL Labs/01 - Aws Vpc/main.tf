@@ -7,8 +7,64 @@ resource "aws_vpc" "vpc" {
   enable_dns_support   = true
 
   tags = {
-    name       = "Vpc feita com terraform"
+    Name       = "Vpc feita com terraform"
     terraform  = "true"
     enviroment = var.enviroment
   }
+}
+
+resource "aws_subnet" "public_subnet" {
+  vpc_id     = aws_vpc.vpc.id
+  cidr_block = var.public_subnet_cidr
+  tags = {
+    Name       = "subnet publica 01"
+    enviroment = var.enviroment
+  }
+}
+
+resource "aws_subnet" "private_subnet" {
+  vpc_id     = aws_vpc.vpc.id
+  cidr_block = var.private_subnet_cidr
+
+  tags = {
+    Name       = "subnet privada 01"
+    enviroment = var.enviroment
+  }
+}
+
+resource "aws_internet_gateway" "main_igw" {
+  vpc_id = aws_vpc.vpc.id
+}
+
+resource "aws_route_table" "route_table_public" {
+  vpc_id = aws_vpc.vpc.id
+  tags = {
+    Name       = "route table publica"
+    enviroment = var.enviroment
+  }
+}
+
+resource "aws_route_table" "route_table_private" {
+  vpc_id = aws_vpc.vpc.id
+
+  tags = {
+    Name       = "route table private"
+    enviroment = var.enviroment
+  }
+}
+
+resource "aws_route" "route_public" {
+  route_table_id         = aws_route_table.route_table_public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.main_igw.id
+}
+
+resource "aws_route_table_association" "roteamento_public_subnet" {
+  subnet_id      = aws_subnet.public_subnet.id
+  route_table_id = aws_route_table.route_table_public.id
+}
+
+resource "aws_route_table_association" "roteament_private_subnet" {
+  subnet_id      = aws_subnet.private_subnet.id
+  route_table_id = aws_route_table.route_table_private.id
 }

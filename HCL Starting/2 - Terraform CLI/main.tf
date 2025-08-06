@@ -21,7 +21,7 @@ provider "aws" {
 # o provider da aws procura automaticamente a AWS_ACCESS_KEY_ID e o AWS_SECRET_ACESS_KEY nas Envs.
 
 variable "num_of_pets" {
-  type = number
+  type        = number
   description = "numero de pets que queremos"
 }
 
