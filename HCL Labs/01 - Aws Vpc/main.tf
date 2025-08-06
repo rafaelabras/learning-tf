@@ -68,3 +68,28 @@ resource "aws_route_table_association" "roteament_private_subnet" {
   subnet_id      = aws_subnet.private_subnet.id
   route_table_id = aws_route_table.route_table_private.id
 }
+
+
+resource "aws_security_group" "sg_group" {
+  name = "teste-sg-group"
+  description = "permite todas entradas e saidas"
+  vpc_id = aws_vpc.vpc.id
+
+  tags = {
+    Name = "allow-all"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "sg_group_ingress" {
+  security_group_id = aws_security_group.sg_group.id
+  cidr_ipv4 = "0.0.0.0/0"
+  cidr_ipv6 = "::/0"
+  ip_protocol = "-1" #semanticamente equivale a todas as portas.
+}
+
+resource "aws_vpc_security_group_egress_rule" "sg_group_egress" {
+  security_group_id = aws_security_group.sg_group.id
+  cidr_ipv4 = "0.0.0.0/0"
+  cidr_ipv6 = "::/0"
+  ip_protocol = "-1"
+}
