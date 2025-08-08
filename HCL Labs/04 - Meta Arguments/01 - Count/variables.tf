@@ -4,7 +4,13 @@ variable "region" {
   default     = "us-east-1"
 }
 
-variable "count" {
+variable "route_table_count" {
+  description = "numero de route tables"
+  type = number
+  default = 2
+}
+
+variable "count_resource" {
   description = "Valor para o count em um resource"
   type        = number
   default     = 3

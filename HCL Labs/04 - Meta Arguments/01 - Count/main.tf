@@ -1,4 +1,3 @@
-# Basic VPC Configuration
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -9,9 +8,9 @@ resource "aws_vpc" "main" {
   }
 }
 
-# Cria tres Subnets
+# Cria 3 Subnets
 resource "aws_subnet" "subnet" {
-  count             = var.count
+  count = var.count_resource
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.${count.index + 1}.0/24"
   availability_zone = "us-east-1${var.count_list[count.index]}"
@@ -22,75 +21,41 @@ resource "aws_subnet" "subnet" {
 }
 
 
-# Security Groups
-resource "aws_security_group" "web" {
-  name        = "web-sg"
-  description = "Allow web traffic"
-  vpc_id      = aws_vpc.main.id
+# cria 3 security groups
 
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group" "security_group" {
+    count = var.count_resource
+    name = var.sg_group[count.index].name
+    description = var.sg_group[count.index].description
+    vpc_id = aws_vpc.main.id
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+    ingress {
+        from_port = var.sg_group[count.index].ingress_port
+        to_port = var.sg_group[count.index].ingress_port
+        protocol = "tcp"
+        cidr_blocks = ["10.0.0.0/16"]
+    }
 
-  tags = {
-    Name = "web-sg"
-  }
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1" # -1 indica todos protocolos.
+        cidr_blocks = ["0.0.0.0/0"]
+        }
+
+    tags = {
+      Name = "${var.sg_group[count.index].name}-sg"
+    }
+  
 }
 
-resource "aws_security_group" "app" {
-  name        = "app-sg"
-  description = "Allow application traffic"
-  vpc_id      = aws_vpc.main.id
+# cria 2 route tables
 
-  ingress {
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_route_table" "route_Table" {
+  count = var.route_table_count
+  vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "app-sg"
-  }
-}
-
-resource "aws_security_group" "db" {
-  name        = "db-sg"
-  description = "Allow database traffic"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "db-sg"
+    Name = "route-table-${count.index + 1}"
   }
 }
