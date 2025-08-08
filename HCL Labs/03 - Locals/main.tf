@@ -11,7 +11,7 @@ locals {
     Region      = data.aws_region.current.name
     ManagedBy   = "terraform"
   }
-    prefixo = "${var.environment}-"
+  prefixo = "${var.environment}-"
 }
 
 resource "aws_vpc" "main" {
@@ -74,7 +74,7 @@ resource "aws_subnet" "private_a" {
 
   tags = {
     Name        = "${local.prefixo}-private-subnet-us-east-1a"
-Environment = local.tags.Environment
+    Environment = local.tags.Environment
     Project     = local.tags.Project
     Owner       = local.tags.Owner
     CostCenter  = local.tags.CostCenter
@@ -92,7 +92,7 @@ resource "aws_subnet" "private_b" {
 
   tags = {
     Name        = "${local.prefixo}-private-subnet-us-east-1b"
-     Environment = local.tags.Environment
+    Environment = local.tags.Environment
     Project     = local.tags.Project
     Owner       = local.tags.Owner
     CostCenter  = local.tags.CostCenter
@@ -130,7 +130,7 @@ resource "aws_security_group" "web" {
 
   tags = {
     Name        = "${local.prefixo}-web-sg"
-        Environment = local.tags.Environment
+    Environment = local.tags.Environment
     Project     = local.tags.Project
     Owner       = local.tags.Owner
     CostCenter  = local.tags.CostCenter
